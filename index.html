@@ -58,15 +58,15 @@
     <div class="card">
       <h3>Acciones rápidas</h3>
       <div class="row">
-        <button onclick="ficharIngreso()">Fichar ingreso</button>
-        <button onclick="ficharSalida()" class="danger">Fichar salida</button>
-        <button onclick="banoInicio()" class="warning">Voy al baño</button>
-        <button onclick="banoFin()" class="success">Volví del baño</button>
-      </div>
-      <p id="accionMsg" class="small"></p>
+       <button onclick="ficharIngreso()">Fichar ingreso</button>
+       <button onclick="ficharSalida()" class="danger">Fichar salida</button>
+       <button onclick="banoInicio()" class="warning">Voy al baño</button>
+       <button onclick="banoFin()" class="success">Volví del baño</button>
+       <button onclick="fumarInicio()" class="warning">Voy a fumar</button>
+       <button onclick="fumarFin()" class="success">Volví de fumar</button>
     </div>
-
     <div class="card" id="novedadesCard">
+      
       <h3>⚠️ Novedades pendientes</h3>
       <div id="novedadesBox">Cargando novedades...</div>
     </div>
@@ -150,7 +150,7 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbygpqBv62g0POqxIsiEUQm_l3HH8ZVuqkmEY0IBSJtQxh9YnB8nUJbfrMVypuBSjini/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxdAn2t9U9nt3q_rOOMd2OKNAcu5QAYPqbKMxK2IOQis0KkIAyq4K-81V-hkca6iMj8/exec";
 
   let operador = JSON.parse(localStorage.getItem("operadorActivo") || "null");
 
@@ -234,7 +234,17 @@
     const r = await api({ action: "banofin", nombre: operador.nombre });
     setMsg("accionMsg", r.ok ? `Regreso registrado. Minutos: ${r.minutos}. Excedió: ${r.excedio}` : r.error);
   }
+  async function fumarInicio() {
+  setMsg("accionMsg", "Registrando salida a fumar...");
+  const r = await api({ action: "fumarinicio", nombre: operador.nombre });
+  setMsg("accionMsg", r.ok ? `Pausa fumar iniciada: ${r.inicio}` : r.error);
+  }
 
+  async function fumarFin() {
+  setMsg("accionMsg", "Registrando regreso de fumar...");
+  const r = await api({ action: "fumarfin", nombre: operador.nombre });
+  setMsg("accionMsg", r.ok ? `Regreso registrado. Minutos: ${r.minutos}. Excedió: ${r.excedio}` : r.error);
+  }
   async function guardarRecepcion() {
     setMsg("recepcionMsg", "Guardando recepción...");
 
@@ -280,7 +290,10 @@
     const box = document.getElementById("novedadesBox");
     box.innerHTML = "Cargando...";
 
-    const r = await api({ action: "getnovedadespendientes" });
+    const r = await api({ 
+  action: "getnovedadespendientes",
+  pc: operador.pc
+});
 
     if (!r.ok || !r.novedades || r.novedades.length === 0) {
       box.innerHTML = `<div class="alert ok">No hay novedades pendientes.</div>`;
