@@ -1,340 +1,230 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel Operativo</title>
+  <meta charset="UTF-8">
+  <title>Sistema Operadores</title>
+
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; background: #f4f6fb; color: #222; }
-    .container { max-width: 1100px; margin: auto; padding: 20px; }
-    .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.08); }
-    h1, h2, h3 { margin-top: 0; }
-    input, select, textarea, button {
-      width: 100%; padding: 12px; margin: 6px 0 12px;
-      border-radius: 10px; border: 1px solid #ccc; font-size: 15px;
+    body {
+      font-family: Arial;
+      background: #111;
+      color: #fff;
+      padding: 20px;
     }
-    button { cursor: pointer; border: none; font-weight: bold; background: #4b5cff; color: white; }
-    button.secondary { background: #555; }
-    button.danger { background: #d93025; }
-    button.success { background: #188038; }
-    button.warning { background: #f9ab00; color: #222; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-    .hidden { display: none; }
-    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #eef; margin: 4px; }
-    .alert { border-left: 5px solid #d93025; background: #fff4f4; padding: 12px; border-radius: 10px; margin-bottom: 10px; }
-    .ok { border-left-color: #188038; background: #f0fff4; }
-    .small { font-size: 13px; color: #666; }
-    .row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .row button { flex: 1; min-width: 180px; }
+
+    .card {
+      background: #1e1e1e;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .danger { background: #c0392b; color: white; }
+    .success { background: #27ae60; color: white; }
+    .warning { background: #f39c12; color: black; }
+    .secondary { background: #555; color: white; }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .novedad {
+      background: #2c3e50;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 
 <body>
-<div class="container">
 
-  <div class="card" id="loginCard">
-    <h1>Panel Operativo</h1>
-    <p class="small">Ingresá con tu nombre y PIN.</p>
+<div id="loginCard" class="card">
+  <h2>Login</h2>
+  <input id="nombre" placeholder="Nombre">
+  <input id="pin" placeholder="PIN" type="password">
+  <br>
+  <button onclick="login()">Ingresar</button>
+</div>
 
-    <label>Operador</label>
-    <input id="loginNombre" placeholder="Ej: Brenda" />
+<div id="app" style="display:none">
 
-    <label>PIN</label>
-    <input id="loginPin" type="password" placeholder="PIN" />
-
-    <button onclick="login()">Ingresar</button>
-    <p id="loginMsg" class="small"></p>
+  <div class="card">
+    <h2>Turno activo</h2>
+    <div id="operadorInfo"></div>
+    <button class="secondary" onclick="cerrarSesion()">Cerrar sesión</button>
   </div>
 
-  <div id="app" class="hidden">
+  <div class="card">
+    <h3>Acciones rápidas</h3>
 
-    <div class="card">
-      <h2>Turno activo</h2>
-      <div id="operadorInfo"></div>
-      <button class="secondary" onclick="cerrarSesion()">Cerrar sesión</button>
+    <div class="row">
+      <button onclick="ficharIngreso()">Fichar ingreso</button>
+      <button onclick="ficharSalida()" class="danger">Fichar salida</button>
+
+      <button onclick="banoInicio()" class="warning">Voy al baño</button>
+      <button onclick="banoFin()" class="success">Volví del baño</button>
+
+      <button onclick="fumarInicio()" class="warning">Voy a fumar</button>
+      <button onclick="fumarFin()" class="success">Volví de fumar</button>
     </div>
-
-    <div class="card">
-      <h3>Acciones rápidas</h3>
-      <div class="row">
-       <button onclick="ficharIngreso()">Fichar ingreso</button>
-       <button onclick="ficharSalida()" class="danger">Fichar salida</button>
-       <button onclick="banoInicio()" class="warning">Voy al baño</button>
-       <button onclick="banoFin()" class="success">Volví del baño</button>
-       <button onclick="fumarInicio()" class="warning">Voy a fumar</button>
-       <button onclick="fumarFin()" class="success">Volví de fumar</button>
-    </div>
-    <div class="card" id="novedadesCard">
-      
-      <h3>⚠️ Novedades pendientes</h3>
-      <div id="novedadesBox">Cargando novedades...</div>
-    </div>
-
-    <div class="card">
-      <h3>Recepción de turno</h3>
-
-      <label>Operador que entrega</label>
-      <input id="entrega" placeholder="Nombre del operador que entrega" />
-
-      <div class="grid">
-        <div>
-          <label>Puesto en orden</label>
-          <select id="puestoOrden"><option>Sí</option><option>No</option></select>
-        </div>
-        <div>
-          <label>Estados WhatsApp OK</label>
-          <select id="whatsappOk"><option>Sí</option><option>No</option></select>
-        </div>
-        <div>
-          <label>Caja correcta</label>
-          <select id="cajaOk"><option>Sí</option><option>No</option></select>
-        </div>
-        <div>
-          <label>Revinculación OK</label>
-          <select id="revinculacionOk"><option>Sí</option><option>No</option></select>
-        </div>
-        <div>
-          <label>Limpieza cumplida</label>
-          <select id="limpiezaCumplida">
-            <option>Sí</option>
-            <option>No</option>
-            <option>No corresponde</option>
-          </select>
-        </div>
-      </div>
-
-      <label>Diferencia de caja / detalle</label>
-      <textarea id="diferenciaCaja"></textarea>
-
-      <label>Teléfonos caídos</label>
-      <textarea id="telefonosCaidos"></textarea>
-
-      <label>Observaciones</label>
-      <textarea id="obsRecepcion"></textarea>
-
-      <button onclick="guardarRecepcion()">Guardar recepción</button>
-      <p id="recepcionMsg" class="small"></p>
-    </div>
-
-    <div class="card">
-      <h3>Reportar novedad</h3>
-
-      <label>Tipo</label>
-      <select id="tipoNovedad">
-        <option>Telefono caido</option>
-        <option>Diferencia caja</option>
-        <option>Reclamo</option>
-        <option>Limpieza</option>
-        <option>Otro</option>
-      </select>
-
-      <label>Prioridad</label>
-      <select id="prioridadNovedad">
-        <option>Media</option>
-        <option>Alta</option>
-        <option>Baja</option>
-      </select>
-
-      <label>Detalle</label>
-      <textarea id="detalleNovedad"></textarea>
-
-      <label>Observaciones</label>
-      <textarea id="obsNovedad"></textarea>
-
-      <button onclick="reportarNovedad()">Reportar novedad</button>
-      <p id="novedadMsg" class="small"></p>
-    </div>
-
   </div>
+
+  <div class="card" id="novedadesCard">
+    <h3>⚠️ Novedades pendientes</h3>
+    <div id="novedadesBox">Cargando novedades...</div>
+  </div>
+
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxdAn2t9U9nt3q_rOOMd2OKNAcu5QAYPqbKMxK2IOQis0KkIAyq4K-81V-hkca6iMj8/exec";
 
-  let operador = JSON.parse(localStorage.getItem("operadorActivo") || "null");
+const URL = "https://script.google.com/macros/s/AKfycbzeVpQRn39hBzPCItnYCsoKddlYFvADoX4Z2_CTvYdi-znHVts_8OX10noLmB3JU4hx/exec";
 
-  window.onload = () => {
-    if (operador) mostrarApp();
-  };
+let operador = null;
 
-  async function api(params) {
-    const url = API_URL + "?" + new URLSearchParams(params).toString();
-    const res = await fetch(url);
-    return await res.json();
+async function api(data){
+  const r = await fetch(URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+  return await r.json();
+}
+
+async function login(){
+  const nombre = document.getElementById("nombre").value;
+  const pin = document.getElementById("pin").value;
+
+  const r = await api({
+    action: "login",
+    nombre,
+    pin
+  });
+
+  if(!r.ok){
+    alert(r.error);
+    return;
   }
 
-  function setMsg(id, msg) {
-    document.getElementById(id).innerText = msg;
+  operador = r.operador;
+
+  document.getElementById("loginCard").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  document.getElementById("operadorInfo").innerHTML =
+    `${operador.nombre} - ${operador.turno} - ${operador.pc}`;
+
+  cargarNovedades();
+}
+
+function cerrarSesion(){
+  operador = null;
+  location.reload();
+}
+
+async function ficharIngreso(){
+  const r = await api({
+    action: "ficharIngreso",
+    nombre: operador.nombre
+  });
+
+  alert("Ingreso registrado");
+}
+
+async function ficharSalida(){
+  const r = await api({
+    action: "ficharSalida",
+    nombre: operador.nombre
+  });
+
+  alert("Salida registrada");
+}
+
+async function banoInicio(){
+  const r = await api({
+    action: "banoInicio",
+    nombre: operador.nombre
+  });
+
+  alert("Inicio baño registrado");
+}
+
+async function banoFin(){
+  const r = await api({
+    action: "banoFin",
+    nombre: operador.nombre
+  });
+
+  alert("Fin baño registrado");
+}
+
+async function fumarInicio(){
+  const r = await api({
+    action: "fumarInicio",
+    nombre: operador.nombre
+  });
+
+  alert("Inicio fumar registrado");
+}
+
+async function fumarFin(){
+  const r = await api({
+    action: "fumarFin",
+    nombre: operador.nombre
+  });
+
+  alert("Fin fumar registrado");
+}
+
+async function cargarNovedades(){
+
+  const r = await api({
+    action: "getNovedadesPendientes",
+    pc: operador.pc
+  });
+
+  const box = document.getElementById("novedadesBox");
+
+  if(!r.ok || r.data.length === 0){
+    box.innerHTML = "Sin novedades pendientes";
+    return;
   }
 
-  async function login() {
-    const nombre = document.getElementById("loginNombre").value.trim();
-    const pin = document.getElementById("loginPin").value.trim();
+  let html = "";
 
-    if (!nombre || !pin) {
-      setMsg("loginMsg", "Completá nombre y PIN.");
-      return;
-    }
-
-    setMsg("loginMsg", "Validando...");
-
-    const r = await api({ action: "login", nombre, pin });
-
-    if (!r.ok) {
-      setMsg("loginMsg", r.error || "No se pudo ingresar.");
-      return;
-    }
-
-    operador = r.operador;
-    localStorage.setItem("operadorActivo", JSON.stringify(operador));
-    mostrarApp();
-  }
-
-  function mostrarApp() {
-    document.getElementById("loginCard").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-
-    document.getElementById("operadorInfo").innerHTML = `
-      <span class="badge"><b>${operador.nombre}</b></span>
-      <span class="badge">Turno: ${operador.turno}</span>
-      <span class="badge">PC: ${operador.pc}</span>
-      <span class="badge">Tipo: ${operador.tipo}</span>
+  r.data.forEach(n => {
+    html += `
+      <div class="novedad">
+        <b>${n.tipo}</b><br>
+        ${n.detalle || ''}<br>
+        <small>${n.fecha}</small>
+      </div>
     `;
+  });
 
-    cargarNovedades();
-  }
+  box.innerHTML = html;
 
-  function cerrarSesion() {
-    localStorage.removeItem("operadorActivo");
-    location.reload();
-  }
+  // 🔥 ALERTA AUTOMÁTICA
+  alert("⚠️ Tenés novedades pendientes en tu PC");
+}
 
-  async function ficharIngreso() {
-    setMsg("accionMsg", "Registrando ingreso...");
-    const r = await api({ action: "ficharingreso", nombre: operador.nombre });
-    setMsg("accionMsg", r.ok ? `Ingreso registrado: ${r.estado} (${r.hora || ""})` : r.error);
-  }
-
-  async function ficharSalida() {
-    setMsg("accionMsg", "Registrando salida...");
-    const r = await api({ action: "ficharsalida", nombre: operador.nombre });
-    setMsg("accionMsg", r.ok ? "Salida registrada correctamente." : r.error);
-    if (r.ok) cerrarSesion();
-  }
-
-  async function banoInicio() {
-    setMsg("accionMsg", "Registrando salida al baño...");
-    const r = await api({ action: "banoinicio", nombre: operador.nombre });
-    setMsg("accionMsg", r.ok ? `Baño iniciado: ${r.inicio}` : r.error);
-  }
-
-  async function banoFin() {
-    setMsg("accionMsg", "Registrando regreso del baño...");
-    const r = await api({ action: "banofin", nombre: operador.nombre });
-    setMsg("accionMsg", r.ok ? `Regreso registrado. Minutos: ${r.minutos}. Excedió: ${r.excedio}` : r.error);
-  }
-  async function fumarInicio() {
-  setMsg("accionMsg", "Registrando salida a fumar...");
-  const r = await api({ action: "fumarinicio", nombre: operador.nombre });
-  setMsg("accionMsg", r.ok ? `Pausa fumar iniciada: ${r.inicio}` : r.error);
-  }
-
-  async function fumarFin() {
-  setMsg("accionMsg", "Registrando regreso de fumar...");
-  const r = await api({ action: "fumarfin", nombre: operador.nombre });
-  setMsg("accionMsg", r.ok ? `Regreso registrado. Minutos: ${r.minutos}. Excedió: ${r.excedio}` : r.error);
-  }
-  async function guardarRecepcion() {
-    setMsg("recepcionMsg", "Guardando recepción...");
-
-    const r = await api({
-      action: "recepcionturno",
-      recibe: operador.nombre,
-      entrega: document.getElementById("entrega").value,
-      puestoOrden: document.getElementById("puestoOrden").value,
-      whatsappOk: document.getElementById("whatsappOk").value,
-      cajaOk: document.getElementById("cajaOk").value,
-      diferenciaCaja: document.getElementById("diferenciaCaja").value,
-      revinculacionOk: document.getElementById("revinculacionOk").value,
-      telefonosCaidos: document.getElementById("telefonosCaidos").value,
-      limpiezaCumplida: document.getElementById("limpiezaCumplida").value,
-      observaciones: document.getElementById("obsRecepcion").value
-    });
-
-    setMsg("recepcionMsg", r.ok ? "Recepción guardada correctamente." : r.error);
-  }
-
-  async function reportarNovedad() {
-    setMsg("novedadMsg", "Guardando novedad...");
-
-    const r = await api({
-      action: "novedad",
-      nombre: operador.nombre,
-      tipo: document.getElementById("tipoNovedad").value,
-      prioridad: document.getElementById("prioridadNovedad").value,
-      detalle: document.getElementById("detalleNovedad").value,
-      observaciones: document.getElementById("obsNovedad").value
-    });
-
-    setMsg("novedadMsg", r.ok ? `Novedad registrada. ID: ${r.id}` : r.error);
-
-    if (r.ok) {
-      document.getElementById("detalleNovedad").value = "";
-      document.getElementById("obsNovedad").value = "";
-      cargarNovedades();
-    }
-  }
-
-  async function cargarNovedades() {
-    const box = document.getElementById("novedadesBox");
-    box.innerHTML = "Cargando...";
-
-    const r = await api({ 
-  action: "getnovedadespendientes",
-  pc: operador.pc
-});
-
-    if (!r.ok || !r.novedades || r.novedades.length === 0) {
-      box.innerHTML = `<div class="alert ok">No hay novedades pendientes.</div>`;
-      return;
-    }
-
-    box.innerHTML = "";
-
-    r.novedades.forEach(n => {
-      const div = document.createElement("div");
-      div.className = "alert";
-      div.innerHTML = `
-        <b>${n.tipo}</b> · ${n.prioridad} · ${n.estado}<br>
-        <span class="small">Fecha: ${n.fecha} | Turno: ${n.turno} | PC: ${n.pc} | Operador: ${n.operador}</span>
-        <p>${n.detalle || ""}</p>
-        <p class="small">${n.observaciones || ""}</p>
-        <div class="row">
-          <button class="warning" onclick="actualizarNovedad('${n.id}','En seguimiento')">En seguimiento</button>
-          <button class="success" onclick="actualizarNovedad('${n.id}','Resuelta')">Resuelta</button>
-        </div>
-      `;
-      box.appendChild(div);
-    });
-  }
-
-  async function actualizarNovedad(id, estado) {
-    const resolucion = estado === "Resuelta"
-      ? prompt("Detalle de resolución:")
-      : "Tomado en seguimiento";
-
-    const r = await api({
-      action: "actualizarnovedad",
-      id,
-      estado,
-      revisadoPor: operador.nombre,
-      resolucion: resolucion || ""
-    });
-
-    if (r.ok) cargarNovedades();
-    else alert(r.error || "No se pudo actualizar.");
-  }
 </script>
+
 </body>
 </html>
